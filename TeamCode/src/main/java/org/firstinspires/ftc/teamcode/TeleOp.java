@@ -5,6 +5,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvInternalCamera;
+import org.openftc.easyopencv.OpenCvInternalCamera2;
+
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOp", group="Linear Opmode")
 public class TeleOp extends LinearOpMode
 {
@@ -76,6 +82,7 @@ public class TeleOp extends LinearOpMode
     // Enumerations //
     private enum FlywheelMode {FULL, POWERSHOT, OFF}
 
+
     @Override
     public void runOpMode()
     {
@@ -108,6 +115,22 @@ public class TeleOp extends LinearOpMode
         // Initialize Servos //
         wobbleGrabber = hardwareMap.get(Servo.class, "wobbleGrabber");
         donutFlicker = hardwareMap.get(Servo.class, "donutFlicker");
+
+        // Initialize Camera Monitor //
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+
+        // Create Camera Instance //
+        OpenCvCamera camera = OpenCvCameraFactory.getInstance().createInternalCamera2(OpenCvInternalCamera2.CameraDirection.BACK, cameraMonitorViewId);
+
+        // Open Camera //
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                camera.startStreaming(1920, 1080, OpenCvCameraRotation.UPRIGHT);
+            }
+        });
 
         // Wait for start
         waitForStart();
@@ -261,11 +284,11 @@ public class TeleOp extends LinearOpMode
         }
         else if (flywheelTargetVelocity == flywheelFullVelocity)
         {
-            flywheel.setPower(0.87);
+            flywheel.setPower(0.83);
         }
         else if (flywheelTargetVelocity == flywheelPowershotVelocity)
         {
-            flywheel.setPower(0.8);
+            flywheel.setPower(0.75);
         }
     }
 }
