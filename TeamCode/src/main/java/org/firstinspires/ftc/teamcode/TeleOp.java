@@ -1,9 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Point;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvInternalCamera2;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOp", group="Linear Opmode")
 public class TeleOp extends LinearOpMode
@@ -66,8 +73,8 @@ public class TeleOp extends LinearOpMode
     private double flywheelOldPosition = 0.0;
     private double flywheelVelocity = 0.0;
     private double flywheelTargetVelocity = 0.0;
-    private double flywheelFullVelocity = 2100;
-    private double flywheelPowershotVelocity = 1800;
+    private double flywheelFullVelocity = 1900.0;
+    private double flywheelPowershotVelocity = 1650.0;
     private double flywheelOffVelocity = 0.0;
     private double time = 0.0;
     private double oldTime = 0.0;
@@ -75,6 +82,10 @@ public class TeleOp extends LinearOpMode
 
     // Enumerations //
     private enum FlywheelMode {FULL, POWERSHOT, OFF}
+
+    // OpenCV Stuff //
+    OpenCvInternalCamera2 camera = null;
+    RingCounterPipeline ringCounterPipeline = null;
 
     @Override
     public void runOpMode()
@@ -109,11 +120,36 @@ public class TeleOp extends LinearOpMode
         wobbleGrabber = hardwareMap.get(Servo.class, "wobbleGrabber");
         donutFlicker = hardwareMap.get(Servo.class, "donutFlicker");
 
+        // Open Camera Monitor //
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+
+        // Open Camera //
+        camera = OpenCvCameraFactory.getInstance().createInternalCamera2(OpenCvInternalCamera2.CameraDirection.BACK, cameraMonitorViewId);
+
+        // Start Stream and Enable GPU Acceleration for the Viewport //
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                camera.setViewportRenderer(OpenCvCamera.ViewportRenderer.GPU_ACCELERATED);
+                camera.startStreaming(1280, 960, OpenCvCameraRotation.UPRIGHT);
+            }
+        });
+
+        // Create Pipeline //
+        ringCounterPipeline = new RingCounterPipeline();
+
+        // Set Pipeline //
+        camera.setPipeline(ringCounterPipeline);
+
         // Wait for start
         waitForStart();
         runtime.reset();
 
-        // Run loop
+        camera.stopStreaming();
+
+        // Run loop //
         while (opModeIsActive())
         {
             // send information to driver station //
@@ -136,6 +172,7 @@ public class TeleOp extends LinearOpMode
         telemetry.addData("flywheel mode", flywheelMode);
         telemetry.addData("slow mode", slowMode);
         telemetry.addData("reverse mode", reverseMode);
+        telemetry.addData("number of rings", ringCounterPipeline.getRingNumber());
         telemetry.update();
     }
 
@@ -261,11 +298,11 @@ public class TeleOp extends LinearOpMode
         }
         else if (flywheelTargetVelocity == flywheelFullVelocity)
         {
-            flywheel.setPower(0.87);
+            flywheel.setPower(0.86);
         }
         else if (flywheelTargetVelocity == flywheelPowershotVelocity)
         {
-            flywheel.setPower(0.8);
+            flywheel.setPower(0.75);
         }
     }
 }
