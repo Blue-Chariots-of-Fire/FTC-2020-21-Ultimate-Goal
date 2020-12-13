@@ -76,6 +76,7 @@ public class Autonomous extends LinearOpMode {
     private double time = 0.0;
     private double oldTime = 0.0;
     private double deltaTime = 0.0;
+    private Object OpenCvCamera;
 
     // Enumerations //
     private enum FlywheelMode {FULL, POWERSHOT, OFF}
@@ -84,8 +85,9 @@ public class Autonomous extends LinearOpMode {
     @Override
     public void runOpMode() {
 
+        
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        OpenCvCamera camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+        OpenCvCamera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
         // Initialize Telemetry //
         telemetry.addData("Status", "Initialized");
         telemetry.update();
