@@ -64,7 +64,7 @@ public class TeleOp extends LinearOpMode
     private boolean reverseMode = false;
 
     // Wobble Arm Variables //
-    private final double wobbleArmPowerPercent = 1.0;
+    private final double wobbleArmPowerPercent = 0.5;
 
     // Shooter Variables //
     private FlywheelMode flywheelMode = FlywheelMode.OFF;
