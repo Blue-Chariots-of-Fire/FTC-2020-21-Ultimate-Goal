@@ -52,8 +52,8 @@ public class TeleOp extends LinearOpMode
     private double intakePower = 0.0;
     private double uptakePower = 0.0;
     private boolean donutFlickerFlicked = false;
-    private boolean intakeOn = false;
-    private boolean uptakeOn = false;
+    private final double flickerFlicked = 0.5;
+    private final double flickerReady = 0.79;
 
     //Drive Input Variables //
     private double drive = 0.0;
@@ -69,12 +69,13 @@ public class TeleOp extends LinearOpMode
     private double slowModePowerPercent = 0.5;
     private boolean reverseMode = false;
 
-    // Wobble Arm Variables //
+    // Wobble Variables //
     private final double wobbleArmPowerPercent = 0.43;
+    private final double wobbleOpen = 0.5;
+    private final double wobbleClosed = 1.0;
 
     // Shooter Variables //
     private FlywheelMode flywheelMode = FlywheelMode.OFF;
-    private double flywheelPower = 0.0;
     private double flywheelPosition = 0.0;
     private double flywheelOldPosition = 0.0;
     private double flywheelVelocity = 0.0;
@@ -85,6 +86,7 @@ public class TeleOp extends LinearOpMode
     private double time = 0.0;
     private double oldTime = 0.0;
     private double deltaTime = 0.0;
+    private final double flywheelMaxPower = 1.0;
 
     // Enumerations //
     private enum FlywheelMode {FULL, POWERSHOT, OFF}
@@ -92,6 +94,8 @@ public class TeleOp extends LinearOpMode
     // OpenCV Stuff //
     OpenCvInternalCamera2 camera = null;
     RingCounterPipeline ringCounterPipeline = null;
+    private final int webcamWidth = 1920;
+    private final int webcamHeight = 1080;
 
     @Override
     public void runOpMode()
@@ -142,7 +146,7 @@ public class TeleOp extends LinearOpMode
             public void onOpened()
             {
                 camera.setViewportRenderer(OpenCvCamera.ViewportRenderer.GPU_ACCELERATED);
-                camera.startStreaming(1920, 1080, OpenCvCameraRotation.UPRIGHT);
+                camera.startStreaming(webcamWidth, webcamHeight, OpenCvCameraRotation.UPRIGHT);
             }
         });
 
@@ -185,7 +189,6 @@ public class TeleOp extends LinearOpMode
         telemetry.addData("avgR:", ringCounterPipeline.getAvgR());
         telemetry.addData("avgG:", ringCounterPipeline.getAvgG());
         telemetry.addData("avgB:", ringCounterPipeline.getAvgB());
-        //push test
         telemetry.update();
     }
 
@@ -219,9 +222,6 @@ public class TeleOp extends LinearOpMode
             strafe *= -1;
         }
 
-        telemetry.addData("reverse mode", reverseMode);
-        telemetry.addData("slow mode", slowMode);
-
         // compute motor powers //
         frontLeftPower = drive + strafe + turn;
         frontRightPower = drive - strafe - turn;
@@ -237,21 +237,23 @@ public class TeleOp extends LinearOpMode
 
     private void wobble ()
     {
-        
+        // get inputs from controller //
         armIn = gamepad2.right_stick_y;
-        wobbleArmPower = armIn * wobbleArmPowerPercent;
-        wobbleArm.setPower(wobbleArmPower);
-
         if(gamepad2.a) {wobbleGrabberOpen = true;}
         else if (gamepad2.b) {wobbleGrabberOpen = false;}
 
+        // calculate wobble arm motor power //
+        wobbleArmPower = armIn * wobbleArmPowerPercent;
+        wobbleArm.setPower(wobbleArmPower);
+
+        // set wobble grabber servo positions //
         if (wobbleGrabberOpen)
         {
-            wobbleGrabber.setPosition(0.5);
+            wobbleGrabber.setPosition(wobbleOpen);
         }
         else
         {
-            wobbleGrabber.setPosition(1.0);
+            wobbleGrabber.setPosition(wobbleClosed);
         }
     }
 
@@ -277,11 +279,11 @@ public class TeleOp extends LinearOpMode
 
         if (donutFlickerFlicked)
         {
-            donutFlicker.setPosition(0.5);
+            donutFlicker.setPosition(flickerFlicked);
         }
         else
         {
-            donutFlicker.setPosition(0.79);
+            donutFlicker.setPosition(flickerReady);
         }
 
         switch (flywheelMode)
@@ -302,6 +304,13 @@ public class TeleOp extends LinearOpMode
         flywheelPosition = flywheel.getCurrentPosition();
         flywheelVelocity = (flywheelPosition - flywheelOldPosition)/deltaTime;
 
-        flywheel.setVelocity(flywheelTargetVelocity);
+        if (gamepad1.right_bumper)
+        {
+            flywheel.setPower(flywheelMaxPower);
+        }
+        else
+        {
+            flywheel.setVelocity(flywheelTargetVelocity);
+        }
     }
 }
