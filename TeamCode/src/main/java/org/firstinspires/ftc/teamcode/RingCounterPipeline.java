@@ -23,9 +23,9 @@ public class RingCounterPipeline extends OpenCvPipeline {
     {
         input.copyTo(displayMat);
 
-        Imgproc.rectangle(displayMat, new Point(820, 527), new Point(940, 754), new Scalar(255, 0, 0), 2);
+        Imgproc.rectangle(displayMat, new Point(1620, 727), new Point(1840, 854), new Scalar(255, 0, 0), 2);
 
-        zoomedMat = input.submat(527, 754, 820, 940);
+        zoomedMat = input.submat(327, 854, 1620, 1840);
 
         avgR = (int) Core.mean(zoomedMat).val[0];
         avgG = (int) Core.mean(zoomedMat).val[1];
@@ -41,7 +41,7 @@ public class RingCounterPipeline extends OpenCvPipeline {
             ringNumber = RingNumber.FOUR;
         }
 
-        return zoomedMat;
+        return displayMat;
     }
 
     public RingNumber getRingNumber() {

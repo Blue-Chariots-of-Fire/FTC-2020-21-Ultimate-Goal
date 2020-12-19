@@ -80,8 +80,8 @@ public class TeleOp extends LinearOpMode
     private double flywheelOldPosition = 0.0;
     private double flywheelVelocity = 0.0;
     private double flywheelTargetVelocity = 0.0;
-    private double flywheelFullVelocity = 1900.0;
-    private double flywheelPowershotVelocity = 1650.0;
+    private double flywheelFullVelocity = 2150.0;
+    private double flywheelPowershotVelocity = 1950.0;
     private double flywheelOffVelocity = 0.0;
     private double time = 0.0;
     private double oldTime = 0.0;
@@ -181,7 +181,7 @@ public class TeleOp extends LinearOpMode
     private void info ()
     {
         telemetry.addData("Status", "Run Time: " + runtime.toString());
-        telemetry.addData("flywheel velocity", flywheelVelocity);
+        telemetry.addData("flywheel velocity", flywheel.getVelocity());
         telemetry.addData("flywheel mode", flywheelMode);
         telemetry.addData("slow mode", slowMode);
         telemetry.addData("reverse mode", reverseMode);
@@ -296,6 +296,7 @@ public class TeleOp extends LinearOpMode
                 flywheelTargetVelocity = flywheelPowershotVelocity; break;
         }
 
+        /*
         oldTime = time;
         time = getRuntime();
         deltaTime = time - oldTime;
@@ -303,6 +304,7 @@ public class TeleOp extends LinearOpMode
         flywheelOldPosition = flywheelPosition;
         flywheelPosition = flywheel.getCurrentPosition();
         flywheelVelocity = (flywheelPosition - flywheelOldPosition)/deltaTime;
+         */
 
         if (gamepad1.right_bumper)
         {
