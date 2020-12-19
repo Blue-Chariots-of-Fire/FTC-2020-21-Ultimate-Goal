@@ -4,9 +4,12 @@ import android.graphics.Point;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.internal.camera.WebcamExample;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -15,6 +18,7 @@ import org.openftc.easyopencv.OpenCvInternalCamera2;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOp", group="Linear Opmode")
 public class TeleOp extends LinearOpMode
 {
+
     // Software Components //
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -27,8 +31,8 @@ public class TeleOp extends LinearOpMode
     //Auxiliary Motors //
     private DcMotor wobbleArm = null;
     private DcMotor intake = null;
-    private DcMotor uptake = null;
-    private DcMotor flywheel = null;
+   // private DcMotor uptake = null;
+    private DcMotorEx flywheel = null;
 
     // Servos //
     private Servo wobbleGrabber = null;
@@ -48,6 +52,8 @@ public class TeleOp extends LinearOpMode
     private double intakePower = 0.0;
     private double uptakePower = 0.0;
     private boolean donutFlickerFlicked = false;
+    private boolean intakeOn = false;
+    private boolean uptakeOn = false;
 
     //Drive Input Variables //
     private double drive = 0.0;
@@ -64,7 +70,7 @@ public class TeleOp extends LinearOpMode
     private boolean reverseMode = false;
 
     // Wobble Arm Variables //
-    private final double wobbleArmPowerPercent = 0.5;
+    private final double wobbleArmPowerPercent = 0.43;
 
     // Shooter Variables //
     private FlywheelMode flywheelMode = FlywheelMode.OFF;
@@ -108,13 +114,13 @@ public class TeleOp extends LinearOpMode
         // Initialize Auxiliary Motors //
         wobbleArm = hardwareMap.get(DcMotor.class, "wobbleArm");
         intake = hardwareMap.get(DcMotor.class, "intake");
-        uptake = hardwareMap.get(DcMotor.class, "uptake");
-        flywheel = hardwareMap.get(DcMotor.class, "flywheel");
+        //uptake = hardwareMap.get(DcMotor.class, "uptake");
+        flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
         // Set Auxiliary Motor Directions //
         wobbleArm.setDirection(DcMotor.Direction.FORWARD);
         intake.setDirection(DcMotor.Direction.FORWARD);
-        uptake.setDirection(DcMotor.Direction.FORWARD);
-        flywheel.setDirection(DcMotor.Direction.REVERSE);
+        //uptake.setDirection(DcMotor.Direction.FORWARD);
+        flywheel.setDirection(DcMotorEx.Direction.REVERSE);
 
         // Initialize Servos //
         wobbleGrabber = hardwareMap.get(Servo.class, "wobbleGrabber");
@@ -124,7 +130,10 @@ public class TeleOp extends LinearOpMode
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
         // Open Camera //
-        camera = OpenCvCameraFactory.getInstance().createInternalCamera2(OpenCvInternalCamera2.CameraDirection.BACK, cameraMonitorViewId);
+        //camera = OpenCvCameraFactory.getInstance().createInternalCamera2(OpenCvInternalCamera2.CameraDirection.BACK, cameraMonitorViewId);
+        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam");
+        OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+
 
         // Start Stream and Enable GPU Acceleration for the Viewport //
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
@@ -133,7 +142,7 @@ public class TeleOp extends LinearOpMode
             public void onOpened()
             {
                 camera.setViewportRenderer(OpenCvCamera.ViewportRenderer.GPU_ACCELERATED);
-                camera.startStreaming(1280, 960, OpenCvCameraRotation.UPRIGHT);
+                camera.startStreaming(1920, 1080, OpenCvCameraRotation.UPRIGHT);
             }
         });
 
@@ -147,7 +156,7 @@ public class TeleOp extends LinearOpMode
         waitForStart();
         runtime.reset();
 
-        camera.stopStreaming();
+        //camera.stopStreaming();
 
         // Run loop //
         while (opModeIsActive())
@@ -173,6 +182,9 @@ public class TeleOp extends LinearOpMode
         telemetry.addData("slow mode", slowMode);
         telemetry.addData("reverse mode", reverseMode);
         telemetry.addData("number of rings", ringCounterPipeline.getRingNumber());
+        telemetry.addData("avgR:", ringCounterPipeline.getAvgR());
+        telemetry.addData("avgG:", ringCounterPipeline.getAvgG());
+        telemetry.addData("avgB:", ringCounterPipeline.getAvgB());
         telemetry.update();
     }
 
@@ -224,6 +236,7 @@ public class TeleOp extends LinearOpMode
 
     private void wobble ()
     {
+        
         armIn = gamepad2.right_stick_y;
         wobbleArmPower = armIn * wobbleArmPowerPercent;
         wobbleArm.setPower(wobbleArmPower);
@@ -248,7 +261,7 @@ public class TeleOp extends LinearOpMode
         uptakePower = -intakeIn;
 
         intake.setPower(intakePower);
-        uptake.setPower(uptakePower);
+        //uptake.setPower(uptakePower);
     }
 
     private void shooter ()
@@ -288,21 +301,6 @@ public class TeleOp extends LinearOpMode
         flywheelPosition = flywheel.getCurrentPosition();
         flywheelVelocity = (flywheelPosition - flywheelOldPosition)/deltaTime;
 
-        if (flywheelTargetVelocity == flywheelOffVelocity)
-        {
-            flywheel.setPower(0.0);
-        }
-        else if (flywheelVelocity < flywheelTargetVelocity)
-        {
-            flywheel.setPower(1.0);
-        }
-        else if (flywheelTargetVelocity == flywheelFullVelocity)
-        {
-            flywheel.setPower(0.86);
-        }
-        else if (flywheelTargetVelocity == flywheelPowershotVelocity)
-        {
-            flywheel.setPower(0.75);
-        }
+        flywheel.setVelocity(flywheelTargetVelocity);
     }
 }
