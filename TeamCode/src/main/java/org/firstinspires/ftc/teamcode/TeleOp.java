@@ -185,6 +185,7 @@ public class TeleOp extends LinearOpMode
         telemetry.addData("avgR:", ringCounterPipeline.getAvgR());
         telemetry.addData("avgG:", ringCounterPipeline.getAvgG());
         telemetry.addData("avgB:", ringCounterPipeline.getAvgB());
+        //push test
         telemetry.update();
     }
 
