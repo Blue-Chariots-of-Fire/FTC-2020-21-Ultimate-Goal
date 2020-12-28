@@ -31,7 +31,6 @@ public class TeleOp extends LinearOpMode
     //Auxiliary Motors //
     private DcMotor wobbleArm = null;
     private DcMotor intake = null;
-   // private DcMotor uptake = null;
     private DcMotorEx flywheel = null;
 
     // Servos //
@@ -114,16 +113,24 @@ public class TeleOp extends LinearOpMode
         frontRight.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.FORWARD);
+        // Set Drive Motor to Use Encoders //
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        // Reset Drive Motor Encoders //
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Initialize Auxiliary Motors //
         wobbleArm = hardwareMap.get(DcMotor.class, "wobbleArm");
         intake = hardwareMap.get(DcMotor.class, "intake");
-        //uptake = hardwareMap.get(DcMotor.class, "uptake");
         flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
         // Set Auxiliary Motor Directions //
         wobbleArm.setDirection(DcMotor.Direction.FORWARD);
         intake.setDirection(DcMotor.Direction.FORWARD);
-        //uptake.setDirection(DcMotor.Direction.FORWARD);
         flywheel.setDirection(DcMotorEx.Direction.REVERSE);
 
         // Initialize Servos //
@@ -189,6 +196,10 @@ public class TeleOp extends LinearOpMode
         telemetry.addData("avgR:", ringCounterPipeline.getAvgR());
         telemetry.addData("avgG:", ringCounterPipeline.getAvgG());
         telemetry.addData("avgB:", ringCounterPipeline.getAvgB());
+        telemetry.addData("frontLeftPos", frontLeft.getCurrentPosition());
+        telemetry.addData("frontRightPos", frontRight.getCurrentPosition());
+        telemetry.addData("backLeftPos", backLeft.getCurrentPosition());
+        telemetry.addData("backRightPos", backRight.getCurrentPosition());
         telemetry.update();
     }
 
