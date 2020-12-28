@@ -112,7 +112,7 @@ public class TeleOp extends LinearOpMode
         // Set Drive Motor Directions //
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
         frontRight.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.FORWARD);
 
         // Initialize Auxiliary Motors //
