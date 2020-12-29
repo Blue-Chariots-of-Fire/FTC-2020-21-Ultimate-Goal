@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TEST", group="Linear Opmode")
+//@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TEST", group="Linear Opmode")
 public class TEST extends LinearOpMode
 {
 
