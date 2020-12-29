@@ -28,6 +28,7 @@ public class TeleOp extends LinearOpMode
     private DcMotor backLeft = null;
     private DcMotor backRight = null;
 
+
     //Auxiliary Motors //
     private DcMotor wobbleArm = null;
     private DcMotor intake = null;
@@ -189,6 +190,9 @@ public class TeleOp extends LinearOpMode
         telemetry.addData("avgR:", ringCounterPipeline.getAvgR());
         telemetry.addData("avgG:", ringCounterPipeline.getAvgG());
         telemetry.addData("avgB:", ringCounterPipeline.getAvgB());
+        telemetry.addData("avg Ground R: ", ringCounterPipeline.getAvgROther());
+        telemetry.addData("avg Ground G: ", ringCounterPipeline.getAvgGOther());
+        telemetry.addData("avg Ground B: ", ringCounterPipeline.getAvgBOther());
         telemetry.update();
     }
 
