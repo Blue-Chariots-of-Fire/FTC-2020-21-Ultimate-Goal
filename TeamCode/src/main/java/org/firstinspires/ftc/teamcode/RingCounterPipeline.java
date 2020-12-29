@@ -46,7 +46,7 @@ public class RingCounterPipeline extends OpenCvPipeline {
         avgG = (int) Core.mean(zoomedMat).val[1];
         avgB = (int) Core.mean(zoomedMat).val[2];
 
-
+        //Ground avg RGB
         avgROther = (int) Core.mean(groundMat).val[0];
         avgGOther = (int) Core.mean(groundMat).val[1];
         avgBOther = (int) Core.mean(groundMat).val[2];
