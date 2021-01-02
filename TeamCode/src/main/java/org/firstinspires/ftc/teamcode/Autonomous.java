@@ -17,8 +17,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera2;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOp", group="Linear Opmode")
-public class TeleOp extends LinearOpMode
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Auto", group="Linear Opmode")
+public class Autonomous extends LinearOpMode
 {
 
     // Software Components //
@@ -33,7 +33,7 @@ public class TeleOp extends LinearOpMode
     //Auxiliary Motors //
     private DcMotor wobbleArm = null;
     private DcMotor intake = null;
-   // private DcMotor uptake = null;
+    // private DcMotor uptake = null;
     private DcMotorEx flywheel = null;
 
     // Servos //

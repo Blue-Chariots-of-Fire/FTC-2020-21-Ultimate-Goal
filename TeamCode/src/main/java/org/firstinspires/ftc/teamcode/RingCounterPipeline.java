@@ -8,60 +8,52 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 public class RingCounterPipeline extends OpenCvPipeline {
-    private Mat zoomedMat = null;
-    private Mat displayMat = new Mat();
-    private Mat groundMat = null;
+    // Matrices //
+    private Mat zoomedMat = null; //zoomed into the donuts
+    private Mat displayMat = new Mat(); //displayed on the screen
 
-    private int avgR = 0;
-    private int avgG = 0;
-    private int avgB = 0;
-    private int avgROther = 0;
-    private int avgGOther = 0;
-    private int avgBOther = 0;
-    private Scalar avgYLow = null;
-    private Scalar avgYHigh = null;
+    // Variables to test HSV values //
+    private int avgHue, avgSaturation, avgValue;
 
+    // thresholds of Hue values for the rings //
+    private final int UPPER_THRESHOLD = 23;
+    private final int LOWER_THRESHOLD = 18;
+
+    // number of rings detected to give to TeleOp //
     private RingNumber ringNumber = null;
 
+    // enumeration of ring number options //
     public enum RingNumber {FOUR, ONE, ZERO}
 
     public Mat processFrame(Mat input) //input is 1280x960
     {
+        // get the image to the display matrix //
         input.copyTo(displayMat);
 
+        // draw rectangle on the display matrix to show the drivers where to aim //
         Imgproc.rectangle(displayMat, new Point(1620, 727), new Point(1840, 854), new Scalar(255, 0, 0), 2);
 
+        // take the submatrix within the rectangle //
         zoomedMat = input.submat(727, 854, 1620, 1840);
 
-        Scalar lowYellow = new Scalar(20, 100, 100);
-        Scalar highYellow = new Scalar(30, 255, 255);
+        // convert to HSV colorspace //
+        Imgproc.cvtColor(zoomedMat, zoomedMat, Imgproc.COLOR_RGB2HSV);
 
-        Imgproc.rectangle(displayMat, new Point(1540, 727), new Point(1620, 854), new Scalar(255, 0, 0), 2);
+        // store average HSV values of the zoomed matrix into variables //
+        avgHue = (int) Core.mean(zoomedMat).val[0];
+        avgSaturation = (int) Core.mean(zoomedMat).val[1];
+        avgValue = (int) Core.mean(zoomedMat).val[2];
 
-        groundMat = input.submat(727, 854, 1540, 1620);
-
-
-
-        avgR = (int) Core.mean(zoomedMat).val[0];
-        avgG = (int) Core.mean(zoomedMat).val[1];
-        avgB = (int) Core.mean(zoomedMat).val[2];
-
-        //Ground avg RGB
-        avgROther = (int) Core.mean(groundMat).val[0];
-        avgGOther = (int) Core.mean(groundMat).val[1];
-        avgBOther = (int) Core.mean(groundMat).val[2];
-
-
-
-
-        if (avgR < 85) {
+        // calculate number of rings //
+        if (avgHue >= UPPER_THRESHOLD) {
             ringNumber = RingNumber.ZERO;
-        } else if (avgR < 105) {
+        } else if (avgHue >= LOWER_THRESHOLD) {
             ringNumber = RingNumber.ONE;
-        } else if (avgR < 135) {
+        } else {
             ringNumber = RingNumber.FOUR;
         }
 
+        // return the display matrix to be displayed //
         return displayMat;
     }
 
@@ -69,23 +61,18 @@ public class RingCounterPipeline extends OpenCvPipeline {
         return ringNumber;
     }
 
-    public int getAvgR() {
-        return avgR;
+    public int getAvgHue() {
+        return avgHue;
     }
 
-    public int getAvgG() {
-        return avgG;
+    public int getAvgSaturation() {
+        return avgSaturation;
     }
 
-    public int getAvgB() {
-        return avgB;
+    public int getAvgValue() {
+        return avgValue;
     }
 
-    public int getAvgROther() { return avgROther; }
-
-    public int getAvgGOther() { return avgGOther; }
-
-    public int getAvgBOther() { return avgGOther; }
 
 
 
