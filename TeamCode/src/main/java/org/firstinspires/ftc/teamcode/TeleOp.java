@@ -132,41 +132,6 @@ public class TeleOp extends LinearOpMode
         wobbleGrabber = hardwareMap.get(Servo.class, "wobbleGrabber");
         donutFlicker = hardwareMap.get(Servo.class, "donutFlicker");
 
-        // Open Camera Monitor //
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-
-        // Open Camera //
-        //camera = OpenCvCameraFactory.getInstance().createInternalCamera2(OpenCvInternalCamera2.CameraDirection.BACK, cameraMonitorViewId);
-        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam");
-        OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
-
-
-        // Start Stream and Enable GPU Acceleration for the Viewport //
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
-            @Override
-            public void onOpened()
-            {
-                camera.setViewportRenderer(OpenCvCamera.ViewportRenderer.GPU_ACCELERATED);
-                camera.startStreaming(webcamWidth, webcamHeight, OpenCvCameraRotation.UPRIGHT);
-            }
-        });
-
-        // Create Pipeline //
-        ringCounterPipeline = new RingCounterPipeline();
-
-        // Set Pipeline //
-        camera.setPipeline(ringCounterPipeline);
-
-        // Wait for start
-        while (!opModeIsActive())
-        {
-            telemetry.addData("number of rings", ringCounterPipeline.getRingNumber());
-            telemetry.update();
-        }
-        runtime.reset();
-
-        camera.stopStreaming();
 
         // Run loop //
         while (opModeIsActive())
