@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Point;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -51,8 +53,8 @@ public class TeleOp extends LinearOpMode
     private double intakePower = 0.0;
     private double uptakePower = 0.0;
     private boolean donutFlickerFlicked = false;
-    private final double flickerFlicked = 0.5;
-    private final double flickerReady = 0.79;
+    private final double FLICKER_FLICKED = 0.5;
+    private final double FLICKER_READY = 0.79;
 
     //Drive Input Variables //
     private double drive = 0.0;
@@ -69,9 +71,9 @@ public class TeleOp extends LinearOpMode
     private boolean reverseMode = false;
 
     // Wobble Variables //
-    private final double wobbleArmPowerPercent = 0.43;
-    private final double wobbleOpen = 0.5;
-    private final double wobbleClosed = 1.0;
+    private final double WOBBLE_ARM_POWER_PERCENT = 0.43;
+    private final double WOBBLE_OPEN = 0.5;
+    private final double WOBBLE_CLOSED = 1.0;
 
     // Shooter Variables //
     private FlywheelMode flywheelMode = FlywheelMode.OFF;
@@ -79,9 +81,9 @@ public class TeleOp extends LinearOpMode
     private double flywheelOldPosition = 0.0;
     private double flywheelVelocity = 0.0;
     private double flywheelTargetVelocity = 0.0;
-    private double flywheelFullVelocity = 2150.0;
-    private double flywheelPowershotVelocity = 1950.0;
-    private double flywheelOffVelocity = 0.0;
+    private final double FLYWHEEL_FULL_VELOCITY = 2000.0;
+    private final double FLYWHEEL_POWERSHOT_VELOCITY = 1950.0;
+    private final double FLYWHEEL_OFF_VELOCITY = 0.0;
     private double time = 0.0;
     private double oldTime = 0.0;
     private double deltaTime = 0.0;
@@ -193,13 +195,9 @@ public class TeleOp extends LinearOpMode
         telemetry.addData("slow mode", slowMode);
         telemetry.addData("reverse mode", reverseMode);
         telemetry.addData("number of rings", ringCounterPipeline.getRingNumber());
-        telemetry.addData("avgR:", ringCounterPipeline.getAvgR());
-        telemetry.addData("avgG:", ringCounterPipeline.getAvgG());
-        telemetry.addData("avgB:", ringCounterPipeline.getAvgB());
-        telemetry.addData("frontLeftPos", frontLeft.getCurrentPosition());
-        telemetry.addData("frontRightPos", frontRight.getCurrentPosition());
-        telemetry.addData("backLeftPos", backLeft.getCurrentPosition());
-        telemetry.addData("backRightPos", backRight.getCurrentPosition());
+        telemetry.addData("avgR:", ringCounterPipeline.getAvgHue());
+        telemetry.addData("avgG:", ringCounterPipeline.getAvgSaturation());
+        telemetry.addData("avgB:", ringCounterPipeline.getAvgValue());
         telemetry.update();
     }
 
@@ -254,17 +252,17 @@ public class TeleOp extends LinearOpMode
         else if (gamepad2.b) {wobbleGrabberOpen = false;}
 
         // calculate wobble arm motor power //
-        wobbleArmPower = armIn * wobbleArmPowerPercent;
+        wobbleArmPower = armIn * WOBBLE_ARM_POWER_PERCENT;
         wobbleArm.setPower(wobbleArmPower);
 
         // set wobble grabber servo positions //
         if (wobbleGrabberOpen)
         {
-            wobbleGrabber.setPosition(wobbleOpen);
+            wobbleGrabber.setPosition(WOBBLE_OPEN);
         }
         else
         {
-            wobbleGrabber.setPosition(wobbleClosed);
+            wobbleGrabber.setPosition(WOBBLE_CLOSED);
         }
     }
 
@@ -290,21 +288,21 @@ public class TeleOp extends LinearOpMode
 
         if (donutFlickerFlicked)
         {
-            donutFlicker.setPosition(flickerFlicked);
+            donutFlicker.setPosition(FLICKER_FLICKED);
         }
         else
         {
-            donutFlicker.setPosition(flickerReady);
+            donutFlicker.setPosition(FLICKER_READY);
         }
 
         switch (flywheelMode)
         {
             case OFF:
-                flywheelTargetVelocity = flywheelOffVelocity; break;
+                flywheelTargetVelocity = FLYWHEEL_OFF_VELOCITY; break;
             case FULL:
-                flywheelTargetVelocity = flywheelFullVelocity; break;
+                flywheelTargetVelocity = FLYWHEEL_FULL_VELOCITY; break;
             case POWERSHOT:
-                flywheelTargetVelocity = flywheelPowershotVelocity; break;
+                flywheelTargetVelocity = FLYWHEEL_POWERSHOT_VELOCITY; break;
         }
 
         /*
