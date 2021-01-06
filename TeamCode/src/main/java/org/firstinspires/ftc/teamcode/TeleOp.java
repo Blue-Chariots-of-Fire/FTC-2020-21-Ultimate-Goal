@@ -39,7 +39,7 @@ public class TeleOp extends LinearOpMode
     private Servo wobbleGrabber = null;
     private Servo donutFlicker = null;
 
-    // Sensors //
+    // Sensors /
 
     // Drive Power Variables //
     private double frontLeftPower = 0.0;
