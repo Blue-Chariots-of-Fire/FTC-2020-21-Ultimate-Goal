@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Point;
-import android.media.MediaCodecInfo;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,7 +10,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.camera.WebcamExample;
-import org.opencv.videoio.VideoCapture;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -33,7 +31,6 @@ public class TeleOp extends LinearOpMode
     //Auxiliary Motors //
     private DcMotor wobbleArm = null;
     private DcMotor intake = null;
-   // private DcMotor uptake = null;
     private DcMotorEx flywheel = null;
 
     // Servos //
@@ -116,22 +113,61 @@ public class TeleOp extends LinearOpMode
         frontRight.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.FORWARD);
+        // Set Drive Motor to Use Encoders //
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        // Reset Drive Motor Encoders //
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Initialize Auxiliary Motors //
         wobbleArm = hardwareMap.get(DcMotor.class, "wobbleArm");
         intake = hardwareMap.get(DcMotor.class, "intake");
-        //uptake = hardwareMap.get(DcMotor.class, "uptake");
         flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
         // Set Auxiliary Motor Directions //
         wobbleArm.setDirection(DcMotor.Direction.FORWARD);
         intake.setDirection(DcMotor.Direction.FORWARD);
-        //uptake.setDirection(DcMotor.Direction.FORWARD);
         flywheel.setDirection(DcMotorEx.Direction.REVERSE);
 
         // Initialize Servos //
         wobbleGrabber = hardwareMap.get(Servo.class, "wobbleGrabber");
         donutFlicker = hardwareMap.get(Servo.class, "donutFlicker");
 
+        // Open Camera Monitor //
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+
+        // Open Camera //
+        //camera = OpenCvCameraFactory.getInstance().createInternalCamera2(OpenCvInternalCamera2.CameraDirection.BACK, cameraMonitorViewId);
+        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam");
+        OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+
+
+        // Start Stream and Enable GPU Acceleration for the Viewport //
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                camera.setViewportRenderer(OpenCvCamera.ViewportRenderer.GPU_ACCELERATED);
+                camera.startStreaming(webcamWidth, webcamHeight, OpenCvCameraRotation.UPRIGHT);
+            }
+        });
+
+        // Create Pipeline //
+        ringCounterPipeline = new RingCounterPipeline();
+
+        // Set Pipeline //
+        camera.setPipeline(ringCounterPipeline);
+
+        // Wait for start
+        waitForStart();
+        runtime.reset();
+
+        //camera.stopStreaming();
 
         // Run loop //
         while (opModeIsActive())
@@ -157,7 +193,13 @@ public class TeleOp extends LinearOpMode
         telemetry.addData("slow mode", slowMode);
         telemetry.addData("reverse mode", reverseMode);
         telemetry.addData("number of rings", ringCounterPipeline.getRingNumber());
-        telemetry.addData("avgHue:", ringCounterPipeline.getAvgHue());
+        telemetry.addData("avgR:", ringCounterPipeline.getAvgR());
+        telemetry.addData("avgG:", ringCounterPipeline.getAvgG());
+        telemetry.addData("avgB:", ringCounterPipeline.getAvgB());
+        telemetry.addData("frontLeftPos", frontLeft.getCurrentPosition());
+        telemetry.addData("frontRightPos", frontRight.getCurrentPosition());
+        telemetry.addData("backLeftPos", backLeft.getCurrentPosition());
+        telemetry.addData("backRightPos", backRight.getCurrentPosition());
         telemetry.update();
     }
 
@@ -264,6 +306,16 @@ public class TeleOp extends LinearOpMode
             case POWERSHOT:
                 flywheelTargetVelocity = flywheelPowershotVelocity; break;
         }
+
+        /*
+        oldTime = time;
+        time = getRuntime();
+        deltaTime = time - oldTime;
+
+        flywheelOldPosition = flywheelPosition;
+        flywheelPosition = flywheel.getCurrentPosition();
+        flywheelVelocity = (flywheelPosition - flywheelOldPosition)/deltaTime;
+         */
 
         if (gamepad1.right_bumper)
         {
