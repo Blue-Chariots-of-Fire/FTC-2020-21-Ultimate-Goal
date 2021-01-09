@@ -42,6 +42,9 @@ LocalizationTest extends LinearOpMode {
             telemetry.addData("x", poseEstimate.getX());
             telemetry.addData("y", poseEstimate.getY());
             telemetry.addData("heading", poseEstimate.getHeading());
+            telemetry.addData("right encoder", drive.localizer.getRightEncoderPosition());
+            telemetry.addData("left encoder", drive.localizer.getLeftEncoderPosition());
+            telemetry.addData("front encoder", drive.localizer.getFrontEncoderPosition());
             telemetry.update();
         }
     }
