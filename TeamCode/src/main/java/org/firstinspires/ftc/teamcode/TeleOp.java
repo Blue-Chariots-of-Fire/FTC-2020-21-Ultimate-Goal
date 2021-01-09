@@ -95,8 +95,8 @@ public class TeleOp extends LinearOpMode
     // OpenCV Stuff //
     OpenCvInternalCamera2 camera = null;
     RingCounterPipeline ringCounterPipeline = null;
-    private final int webcamWidth = 1920;
-    private final int webcamHeight = 1080;
+    private final int WEBCAM_WIDTH = 1920;
+    private final int WEBCAM_HEIGHT = 1080;
 
     @Override
     public void runOpMode()
@@ -116,6 +116,11 @@ public class TeleOp extends LinearOpMode
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.FORWARD);
         // Set Drive Motor to Use Encoders //
+        frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        /*
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -125,6 +130,8 @@ public class TeleOp extends LinearOpMode
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+         */
 
         // Initialize Auxiliary Motors //
         wobbleArm = hardwareMap.get(DcMotor.class, "wobbleArm");
@@ -155,7 +162,7 @@ public class TeleOp extends LinearOpMode
             public void onOpened()
             {
                 camera.setViewportRenderer(OpenCvCamera.ViewportRenderer.GPU_ACCELERATED);
-                camera.startStreaming(webcamWidth, webcamHeight, OpenCvCameraRotation.UPRIGHT);
+                camera.startStreaming(WEBCAM_WIDTH, WEBCAM_HEIGHT, OpenCvCameraRotation.UPRIGHT);
             }
         });
 
@@ -195,9 +202,7 @@ public class TeleOp extends LinearOpMode
         telemetry.addData("slow mode", slowMode);
         telemetry.addData("reverse mode", reverseMode);
         telemetry.addData("number of rings", ringCounterPipeline.getRingNumber());
-        telemetry.addData("avgR:", ringCounterPipeline.getAvgHue());
-        telemetry.addData("avgG:", ringCounterPipeline.getAvgSaturation());
-        telemetry.addData("avgB:", ringCounterPipeline.getAvgValue());
+        telemetry.addData("avgHue:", ringCounterPipeline.getAvgHue());
         telemetry.update();
     }
 
@@ -273,7 +278,6 @@ public class TeleOp extends LinearOpMode
         uptakePower = -intakeIn;
 
         intake.setPower(intakePower);
-        //uptake.setPower(uptakePower);
     }
 
     private void shooter ()
@@ -304,16 +308,6 @@ public class TeleOp extends LinearOpMode
             case POWERSHOT:
                 flywheelTargetVelocity = FLYWHEEL_POWERSHOT_VELOCITY; break;
         }
-
-        /*
-        oldTime = time;
-        time = getRuntime();
-        deltaTime = time - oldTime;
-
-        flywheelOldPosition = flywheelPosition;
-        flywheelPosition = flywheel.getCurrentPosition();
-        flywheelVelocity = (flywheelPosition - flywheelOldPosition)/deltaTime;
-         */
 
         if (gamepad1.right_bumper)
         {
