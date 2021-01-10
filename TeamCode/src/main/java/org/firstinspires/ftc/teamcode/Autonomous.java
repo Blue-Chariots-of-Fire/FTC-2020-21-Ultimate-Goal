@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Point;
-import android.media.MediaCodecInfo;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -10,8 +7,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.internal.camera.WebcamExample;
-import org.opencv.videoio.VideoCapture;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -20,7 +15,6 @@ import org.openftc.easyopencv.OpenCvInternalCamera2;
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Auto", group="Linear Opmode")
 public class Autonomous extends LinearOpMode
 {
-
     // Software Components //
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -52,7 +46,6 @@ public class Autonomous extends LinearOpMode
     private double wobbleArmPower = 0.0;
     private boolean wobbleGrabberOpen = false;
     private double intakePower = 0.0;
-    private double uptakePower = 0.0;
     private boolean donutFlickerFlicked = false;
     private final double flickerFlicked = 0.5;
     private final double flickerReady = 0.79;
@@ -78,16 +71,10 @@ public class Autonomous extends LinearOpMode
 
     // Shooter Variables //
     private FlywheelMode flywheelMode = FlywheelMode.OFF;
-    private double flywheelPosition = 0.0;
-    private double flywheelOldPosition = 0.0;
-    private double flywheelVelocity = 0.0;
     private double flywheelTargetVelocity = 0.0;
     private double flywheelFullVelocity = 2150.0;
     private double flywheelPowershotVelocity = 1950.0;
     private double flywheelOffVelocity = 0.0;
-    private double time = 0.0;
-    private double oldTime = 0.0;
-    private double deltaTime = 0.0;
     private final double flywheelMaxPower = 1.0;
 
     // Enumerations //
@@ -99,7 +86,7 @@ public class Autonomous extends LinearOpMode
     private final int webcamWidth = 1920;
     private final int webcamHeight = 1080;
 
-    //Odometry//
+    // RoadRunner //
 
     @Override
     public void runOpMode()
@@ -138,10 +125,8 @@ public class Autonomous extends LinearOpMode
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
         // Open Camera //
-        //camera = OpenCvCameraFactory.getInstance().createInternalCamera2(OpenCvInternalCamera2.CameraDirection.BACK, cameraMonitorViewId);
         WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam");
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
-
 
         // Start Stream and Enable GPU Acceleration for the Viewport //
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
@@ -270,7 +255,6 @@ public class Autonomous extends LinearOpMode
         uptakePower = -intakeIn;
 
         intake.setPower(intakePower);
-        //uptake.setPower(uptakePower);
     }
 
     private void shooter ()
