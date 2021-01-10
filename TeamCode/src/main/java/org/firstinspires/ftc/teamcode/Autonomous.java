@@ -252,7 +252,6 @@ public class Autonomous extends LinearOpMode
     {
         intakeIn = gamepad1.right_trigger - gamepad1.left_trigger;
         intakePower = intakeIn;
-        uptakePower = -intakeIn;
 
         intake.setPower(intakePower);
     }
